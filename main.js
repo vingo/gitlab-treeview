@@ -65,11 +65,13 @@ var vm = {
             ref: vm.repository_ref
         };
 
-        if (vm.rss_mode) {
+        /*
+		if (vm.rss_mode) {
             param.rss_token = vm.rss_token;
         } else {
             param.private_token = vm.private_token;
         }
+		*/
 
         $.get(vm.apiRepoTree, param, function (result) {
             if (parentNode) {
@@ -99,11 +101,13 @@ var vm = {
             ref_name: vm.repository_ref
         };
 
-        if (vm.rss_mode) {
+        /*
+		if (vm.rss_mode) {
             param.rss_token = vm.rss_token;
         } else {
             param.private_token = vm.private_token;
         }
+		*/
 
         $.get(vm.apiRepoTree, param, function (result) {
             var treeArr = [];
