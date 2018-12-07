@@ -20,7 +20,7 @@ Chrome extension to show a code tree on GitLab  :)
 
 ## Change Log
  - v1.6
-    - api V3 to api V4
+    - api V3 to api V4， 去除token，支持Gitlab 11
  - v1.5
     - add expand the current file path
  - v1.4
