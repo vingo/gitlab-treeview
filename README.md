@@ -1,4 +1,4 @@
-- 本副本取自https://github.com/linsage/gitlab-treeview
+- forked from https://github.com/linsage/gitlab-treeview
 
 # GitLab-TreeView
 
@@ -9,7 +9,7 @@ Chrome extension to show a code tree on GitLab  :)
 - Quick preview code
 - GitLab UI style
 - Search File
-- Support gitlab 9.x version
+- Support gitlab 11.x version
 
 ## Installation
 
@@ -22,7 +22,7 @@ Chrome extension to show a code tree on GitLab  :)
 
 ## Change Log
  - v1.6
-    - api V3 to api V4， 去除token，支持Gitlab 11
+    - api V3 to api V4， remove private_token，support Gitlab 11
  - v1.5
     - add expand the current file path
  - v1.4
