@@ -1,3 +1,5 @@
+- 本副本取自https://github.com/linsage/gitlab-treeview
+
 # GitLab-TreeView
 
 Chrome extension to show a code tree on GitLab  :)
