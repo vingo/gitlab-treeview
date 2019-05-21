@@ -42,6 +42,7 @@ var vm = {
         vm.project_id = $('#project_id').val() || $('#search_project_id').val();
         vm.apiRepoTree = vm.apiRootUrl + '/api/v4/projects/' + vm.project_id + '/repository/tree';
         vm.repository_ref = $('#repository_ref').val();
+        vm.treeArr = []
         //console.info(vm)
     },
     loadNode: function (parentNode) {
@@ -94,12 +95,19 @@ var vm = {
             vm.getZTree().addNodes(parentNode, i, treeArr);
         });
     },
-    loadRecursiveNode: function () {
+    next(options) {
+        vm.loadRecursiveNode(options)
+        // console.log('>>>>>>>>>>>>', options)
+    },
+    loadRecursiveNode: function (options) {
         var param = {
             id: vm.project_id,
             recursive: true,
-            ref_name: vm.repository_ref
+            ref_name: vm.repository_ref,
+            per_page: 1000,
+            page:  vm.page || 1
         };
+        param = Object.assign(param, options || {})
 
         /*
 		if (vm.rss_mode) {
@@ -107,11 +115,15 @@ var vm = {
         } else {
             param.private_token = vm.private_token;
         }
-		*/
-
-        $.get(vm.apiRepoTree, param, function (result) {
-            var treeArr = [];
-
+        */
+        options = {}
+        $.get(vm.apiRepoTree, param, function (result, state, xhr) {
+            var treeArr = vm.treeArr;
+            vm.totalPage =  options.totalPage =  options.totalPage ? options.totalPage :  parseInt(xhr.getResponseHeader('x-total-pages') || '0')
+            vm.nextPage =  options.nextPage = xhr.getResponseHeader('x-next-page')? parseInt(xhr.getResponseHeader('x-next-page')): options.totalPage
+            vm.page =  options.page = parseInt(xhr.getResponseHeader('x-page') || '1') + 1
+            vm.hasNext = options.hasNext =  options.page > options.totalPage ? false: true
+            
             if (result) {
                 // Convert the response data to another structure which can be accepted by ztree.
                 for (var i = 0; i < result.length; i++) {
@@ -127,19 +139,28 @@ var vm = {
                         treeArr[path_fragments[0]] = node;
                         treeArr.push(node);
                     } else { // sub level
+                        if(!treeArr.length){
+                            treeArr[path_fragments[0]] = node;
+                            treeArr.push(node);
+                        }
                         var parent = treeArr[path_fragments[0]];
                         for (var j = 1; j < path_fragments.length - 1; j++) {
-                            parent = parent.children_map[path_fragments[j]];
+                            parent && parent.children_map && (parent = parent.children_map[path_fragments[j]])
                         }
-                        parent.children_map[path_fragments[path_fragments.length - 1]] = node;
-                        parent.children.push(node);
+                        if(parent && node.type !== 'blob'){
+                            parent.children_map[path_fragments[path_fragments.length - 1]] = node;
+                            parent.children.push(node);
+                        }
                     }
                 }
             }
-            var selectNodeId = vm.openCurrentPathAndReturnNodeId(treeArr);
-            var ztree = vm.getZTree();
-            ztree.addNodes(null, i, treeArr);
-            ztree.selectNode(ztree.getNodeByParam("id", selectNodeId));
+            if(!vm.hasNext){ //load Finished
+                var selectNodeId = vm.openCurrentPathAndReturnNodeId(treeArr);
+                var ztree = vm.getZTree();
+                ztree.addNodes(null, i, treeArr);
+                ztree.selectNode(ztree.getNodeByParam("id", selectNodeId));
+            }
+            options.hasNext && vm.next(options)
         });
     },
     openCurrentPathAndReturnNodeId: function(nodes) {
